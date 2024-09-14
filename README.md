@@ -3,7 +3,7 @@ Test task - log parser (TypeScript)
 
 ## Description
 
-A TypeScript log parsing app that outputs pages with the most hits and unique hits.
+A TypeScript log parsing app that outputs pages with the most hits and unique hits from .log files.
 
 ## How to run
 
