@@ -17,41 +17,31 @@ const readLogFile = (filePath: string): string[] => {
     }
 };
 
-const calculatePageViews = (logs: string[]): { [url: string]: number } => {
+const calculatePageViewsAndUniqueViews = (logs: string[]): { pageViews: { [url: string]: number }, uniqueViews: { [url: string]: Set<string> } } => {
     const pageViews: { [url: string]: number } = {};
-
-    logs.forEach(log => {
-        const [url] = log.split(/\s+/);
-        if (url) {
-            if (pageViews[url]) {
-                pageViews[url]++;
-            } else {
-                pageViews[url] = 1;
-            }
-        }
-    });
-
-    return pageViews;
-};
-
-const calculateUniquePageViews = (logs: string[]): { [url: string]: Set<string> } => {
     const uniqueViews: { [url: string]: Set<string> } = {};
 
     logs.forEach(log => {
         const [url, ip] = log.split(/\s+/);
-        if (url && ip) {
-            if (uniqueViews[url]) {
+
+        if (url) {
+            pageViews[url] = (pageViews[url] || 0) + 1;
+
+            if (ip) {
+                if (!uniqueViews[url]) {
+                    uniqueViews[url] = new Set();
+                }
                 uniqueViews[url].add(ip);
-            } else {
-                uniqueViews[url] = new Set([ip]);
             }
         }
     });
 
-    return uniqueViews;
+    return { pageViews, uniqueViews };
 };
 
-const printResults = (pageViews: { [url: string]: number }, uniqueViews: { [url: string]: Set<string> }) => {
+const printResults = (results: { pageViews: { [url: string]: number }, uniqueViews: { [url: string]: Set<string> } }) => {
+    const { pageViews, uniqueViews } = results;
+
     console.log('Page views:');
     Object.entries(pageViews)
         .sort((a, b) => b[1] - a[1])
@@ -77,10 +67,8 @@ const main = () => {
         return;
     }
 
-    const pageViews = calculatePageViews(logs);
-    const uniquePageViews = calculateUniquePageViews(logs);
-
-    printResults(pageViews, uniquePageViews);
+    const results = calculatePageViewsAndUniqueViews(logs);
+    printResults(results);
 };
 
 main();
